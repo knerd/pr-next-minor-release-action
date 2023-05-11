@@ -18,7 +18,7 @@ inputs:
   BOT_NAME:
     description: 'Name of the bot'
     required: false 
-    default: '🤖 knerd-bot'
+    default: 'knerd-bot'
   BOT_EMAIL:
     description: 'Email of the bot'
     required: false 
@@ -62,9 +62,9 @@ runs:
       uses: repo-sync/pull-request@1b6c62644f972d1a4cf98835ed1efe728d7497a8
       with:
         pr_draft: ${{ inputs.PR_DRAFT }} # Creates pull request as draft
-        source_branch: ${{ steps.bump.outputs.RELEASE }}
+        source_branch: ${{ env.RELEASE }}
         destination_branch: ${{ inputs.MAIN }}
         pr_label: "release"
-        pr_title: "${{ steps.bump.outputs.RELEASE }} 🔖"
+        pr_title: "${{ env.RELEASE }} 🔖"
         pr_template: ${{ inputs.PR_TEMPLATE }}   
         github_token: ${{ inputs.GITHUB_TOKEN }} 

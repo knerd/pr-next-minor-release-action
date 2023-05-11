@@ -51,7 +51,7 @@ runs:
     - name: 📦 Create release branch
       shell: bash
       run: |
-        RELEASE=${{ steps.bump.outputs.RELEASE }}
+        RELEASE=${{ env.RELEASE }}
         git checkout -b $RELEASE
         git push -u origin $RELEASE
     - name: 🧐 Submit pull request

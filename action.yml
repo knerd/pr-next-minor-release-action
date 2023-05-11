@@ -27,6 +27,9 @@ inputs:
     description: 'Template to use for PR creation'
     required: false 
     default: '.github/PULL_REQUEST_TEMPLATE.md'
+  PR_DRAFT:
+    description: 'Flag to turn on draft PRs'
+    required: false 
 runs:
   using: 'composite'
   steps:
@@ -58,7 +61,7 @@ runs:
       id: pr
       uses: repo-sync/pull-request@1b6c62644f972d1a4cf98835ed1efe728d7497a8
       with:
-        pr_draft: true # Creates pull request as draft
+        pr_draft: ${{ inputs.PR_DRAFT }} # Creates pull request as draft
         source_branch: ${{ steps.bump.outputs.RELEASE }}
         destination_branch: ${{ inputs.MAIN }}
         pr_label: "release"

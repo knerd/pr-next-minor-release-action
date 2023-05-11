@@ -18,6 +18,7 @@ This action accepts the following inputs:
 - name: 👆🔖 Dispatch Next Minor Release w/ PR
   uses: knerd/pr-next-minor-release-action@v1
   with:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # used to push new branch and create PR
     MAIN: 'main'
     DEVELOP: 'develop'
     BOT_NAME: '🤖 knerd-bot'

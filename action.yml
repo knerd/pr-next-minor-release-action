@@ -30,6 +30,18 @@ inputs:
   PR_DRAFT:
     description: 'Flag to turn on draft PRs'
     required: false 
+  PR_LABEL: 
+    description: 'label for PR'
+    required: false 
+  PR_ICON: 
+    description: 'Emoji to use as prefix for PR'
+    required: false 
+    default: 🔖
+  NPM_VERSION:
+    description: 'Version to bump'
+    required: false 
+    default: minor
+
 runs:
   using: 'composite'
   steps:
@@ -47,11 +59,11 @@ runs:
       shell: bash
       id: bump
       run: |
-        npm version minor -m "🔖 %s"
+        npm version ${{ inputs.NPM_VERSION }} -m "${{ inputs.PR_ICON }} %s"
         VERSION=$(node -p "require('./package.json').version")
-        echo "RELEASE=release/v${VERSION}" >> $GITHUB_ENV
+        echo "RELEASE=release-${{ inputs.NPM_VERSION }}/v${VERSION}" >> $GITHUB_ENV
 
-    - name: 📦 Create release branch
+    - name: 🌿 Create branch
       shell: bash
       run: |
         RELEASE=${{ env.RELEASE }}
@@ -61,8 +73,8 @@ runs:
       id: pr
       uses: repo-sync/pull-request@1b6c62644f972d1a4cf98835ed1efe728d7497a8
       with:
-        pr_label: "🔖 release"
-        pr_title: "🔖 ${{ env.RELEASE }}"
+        pr_label: ${{ inputs.PR_LABEL }} 
+        pr_title: "${{ inputs.PR_ICON }} ${{ env.RELEASE }}"
         source_branch: ${{ env.RELEASE }}
         destination_branch: ${{ inputs.MAIN }}
         pr_template: ${{ inputs.PR_TEMPLATE }}   

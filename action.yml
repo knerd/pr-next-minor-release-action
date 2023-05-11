@@ -61,7 +61,7 @@ runs:
       run: |
         npm version ${{ inputs.NPM_VERSION }} -m "${{ inputs.PR_ICON }} %s"
         VERSION=$(node -p "require('./package.json').version")
-        echo "RELEASE=release-${{ inputs.NPM_VERSION }}/v${VERSION}" >> $GITHUB_ENV
+        echo "RELEASE=release-${{ inputs.NPM_VERSION }}/${VERSION}" >> $GITHUB_ENV
 
     - name: 🌿 Create branch
       shell: bash

@@ -1,0 +1,67 @@
+name: '🔖 Create Next Minor Release PR'
+description: 'Automatically dispatches a next minor release'
+branding:
+  icon: 'git-pull-request'
+  color: 'green'
+inputs:
+  MAIN:
+    description: 'Main branch name - used for PR destination'
+    required: false 
+    default: 'main'
+  DEVELOP:
+    description: 'Develop branch name - used as ref to cut release branch from'
+    required: false 
+    default: 'develop'
+  BOT_NAME:
+    description: 'Name of the bot'
+    required: false 
+    default: '🤖 knerd-bot'
+  BOT_EMAIL:
+    description: 'Email of the bot'
+    required: false 
+    default: 'contact@midnightnerd.com'
+  PR_TEMPLATE:
+    description: 'Template to use for PR creation'
+    required: false 
+    default: '.github/PULL_REQUEST_TEMPLATE.md'
+  # GITHUB_TOKEN:
+  #   description: 'Token for the repo. Can be passed in using ${{ secrets.GITHUB_TOKEN }}'
+  #   required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: 🏗 Check out ${{ inputs.DEVELOP }} branch
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.DEVELOP }}
+    - name: 🔧 Configure git
+      shell: bash
+      run: |
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        git config --global user.email ${{ inputs.BOT_EMAIL }}
+        git config --global user.name "${{ inputs.BOT_NAME }}" 
+    - name: 🔖 Bump version
+      shell: bash
+      id: bump
+      run: |
+        npm version minor -m "🔖 %s"
+        VERSION=$(node -p "require('./package.json').version")
+        echo "RELEASE=release/v${VERSION}" >> $GITHUB_ENV
+
+    - name: 📦 Create release branch
+      shell: bash
+      run: |
+        RELEASE=${{ steps.bump.outputs.RELEASE }}
+        git checkout -b $RELEASE
+        git push -u origin $RELEASE
+    - name: 🧐 Submit pull request
+      id: pr
+      uses: repo-sync/pull-request@1b6c62644f972d1a4cf98835ed1efe728d7497a8
+      with:
+        pr_draft: true # Creates pull request as draft
+        source_branch: ${{ steps.bump.outputs.RELEASE }}
+        destination_branch: ${{ inputs.MAIN }}
+        pr_label: "release"
+        pr_title: "${{ steps.bump.outputs.RELEASE }} 🔖"
+        pr_template: ${{ inputs.PR_TEMPLATE }}   
+        github_token: ${{ secrets.GITHUB_TOKEN }} 
